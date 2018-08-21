@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gergov-Servebeer-Tasks.01.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gergov-Servebeer-Tasks.10.CsvProcessing", "Gergov-Servebeer-Tasks.10.CsvProcessing\Gergov-Servebeer-Tasks.10.CsvProcessing.csproj", "{C2633034-3404-44BF-8362-E44E074458A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gergov-Servebeer-Tasks.11.Chess", "Gergov-Servebeer-Tasks.11.Chess\Gergov-Servebeer-Tasks.11.Chess.csproj", "{10B56EA8-40CF-4C66-A18C-E4064021DB94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{C2633034-3404-44BF-8362-E44E074458A1}.Release|x64.Build.0 = Release|Any CPU
 		{C2633034-3404-44BF-8362-E44E074458A1}.Release|x86.ActiveCfg = Release|Any CPU
 		{C2633034-3404-44BF-8362-E44E074458A1}.Release|x86.Build.0 = Release|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Debug|x64.Build.0 = Debug|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Debug|x86.Build.0 = Debug|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Release|x64.ActiveCfg = Release|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Release|x64.Build.0 = Release|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Release|x86.ActiveCfg = Release|Any CPU
+		{10B56EA8-40CF-4C66-A18C-E4064021DB94}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
