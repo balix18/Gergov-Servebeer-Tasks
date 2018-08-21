@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Gergov_Servebeer_Tasks._01.Basics</RootNamespace>
+  </PropertyGroup>
+
+</Project>
