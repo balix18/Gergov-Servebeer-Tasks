@@ -64,7 +64,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
         interface IChessPieceCollusion
         {
-            IEnumerable<(int row, int column)> GetCollusionIndices();
+            IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize);
         }
 
         abstract class ChessPiece
@@ -93,7 +93,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 public static char IndexToPrettyColumnConverter(int column) => (char)(column + 'A');
             }
 
-            public abstract IEnumerable<(int row, int column)> GetCollusionIndices();
+            public abstract IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize);
 
             public ChessPiece(ChessPieceType type, char prettyColumn, int prettyRow)
             {
@@ -105,8 +105,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public ChessPiece(ChessPieceType type, (int row, int column) positionIndex)
                 : this(type, InvertedConverter.IndexToPrettyColumnConverter(positionIndex.column), InvertedConverter.IndexToPrettyRowConverter(positionIndex.row))
-            {
-            }
+            { }
 
             public override string ToString() => $"Type: {Type, 7}, PrettyColumn: {PrettyColumn}, PrettyRow: {PrettyRow}, Index: {Index}";
         }
@@ -122,9 +121,63 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 : base(ChessPieceType.Bishop, positionIndex)
             { }
 
-            public override IEnumerable<(int row, int column)> GetCollusionIndices()
+            public override IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize)
             {
-                throw new NotImplementedException();
+                var indices = new List<(int row, int column)>();
+
+                // Bal oldalt lefelé
+                {
+                    (int row, int column) current = (Index.row - 1, Index.column - 1);
+
+                    while (current.row >= 0 && current.column >= 0)
+                    {
+                        indices.Add(current);
+
+                        current.row--;
+                        current.column--;
+                    }
+                }
+
+                // Jobb oldalt felfelé
+                {
+                    (int row, int column) current = (Index.row + 1, Index.column + 1);
+
+                    while (current.row < tableSize.height && current.column < tableSize.width)
+                    {
+                        indices.Add(current);
+
+                        current.row++;
+                        current.column++;
+                    }
+                }
+
+                // Bal oldalt felfelé
+                {
+                    (int row, int column) current = (Index.row + 1, Index.column - 1);
+
+                    while (current.row < tableSize.height && current.column >= 0)
+                    {
+                        indices.Add(current);
+
+                        current.row++;
+                        current.column--;
+                    }
+                }
+
+                // Jobb oldalt lefelé
+                {
+                    (int row, int column) current = (Index.row - 1, Index.column + 1);
+
+                    while (current.row >= 0 && current.column < tableSize.width)
+                    {
+                        indices.Add(current);
+
+                        current.row--;
+                        current.column++;
+                    }
+                }
+
+                return indices;
             }
         }
 
@@ -139,9 +192,30 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 : base(ChessPieceType.King, positionIndex)
             { }
 
-            public override IEnumerable<(int row, int column)> GetCollusionIndices()
+            public override IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize)
             {
-                throw new NotImplementedException();
+                var indices = new List<(int row, int column)>();
+
+                var neighbourOffsetList = new List<(int rowOffset, int columnOffset)>()
+                {
+                     (1, -1),     (1, 0),      (1, 1),
+                     (0, -1),   /* center */   (0, 1),
+                    (-1, -1),    (-1, 0),     (-1, 1),
+                };
+
+                foreach (var (rowOffset, columnOffset) in neighbourOffsetList)
+                {
+                    (int row, int column) finalIndex = (Index.row + rowOffset, Index.column + columnOffset);
+
+                    if (finalIndex.row < 0 || finalIndex.column < 0 || finalIndex.row >= tableSize.height || finalIndex.column >= tableSize.width)
+                    {
+                        continue;
+                    }
+
+                    indices.Add(finalIndex);
+                }
+
+                return indices;
             }
         }
 
@@ -156,9 +230,29 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 : base(ChessPieceType.Rook, positionIndex)
             { }
 
-            public override IEnumerable<(int row, int column)> GetCollusionIndices()
+            public override IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize)
             {
-                throw new NotImplementedException();
+                var indices = new List<(int row, int column)>();
+
+                // Lentről fölfelé
+                for (int row = 0; row < tableSize.height; row++)
+                {
+                    if (row != Index.row)
+                    {
+                        indices.Add((row, Index.column));
+                    }
+                }
+
+                // Balról jobbra
+                for (int column = 0; column < tableSize.width; column++)
+                {
+                    if (column != Index.column)
+                    {
+                        indices.Add((Index.row, column));
+                    }
+                }
+
+                return indices;
             }
         }
 
@@ -204,26 +298,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             {
                 if (chessPiece?.Type != ChessPieceType.Rook) throw new ArgumentException("Chess piece does not exist or not rook type.");
 
-                List<(int row, int column)> indices = new List<(int row, int column)>();
-
-                // Lentről fölfelé
-                for (int row = 0; row < Height; row++)
-                {
-                    if (row != chessPiece.Index.row)
-                    {
-                        indices.Add((row, chessPiece.Index.column));
-                    }
-                }
-
-                // Balról jobbra
-                for (int column = 0; column < Width; column++)
-                {
-                    if (column != chessPiece.Index.column)
-                    {
-                        indices.Add((chessPiece.Index.row, column));
-                    }
-                }
-
+                var indices = (chessPiece as RookChessPiece).GetCollusionIndices((Width, Height));
                 return IsInCollusionByIndices(indices, allowedCollusion);
             }
 
@@ -231,60 +306,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             {
                 if (chessPiece?.Type != ChessPieceType.Bishop) throw new ArgumentException("Chess piece does not exist or not rook type.");
 
-                List<(int row, int column)> indices = new List<(int row, int column)>();
-
-                // Bal oldalt lefelé
-                {
-                    (int row, int column) current = (chessPiece.Index.row - 1, chessPiece.Index.column - 1);
-
-                    while (current.row >= 0 && current.column >= 0)
-                    {
-                        indices.Add(current);
-
-                        current.row--;
-                        current.column--;
-                    }
-                }
-
-                // Jobb oldalt felfelé
-                {
-                    (int row, int column) current = (chessPiece.Index.row + 1, chessPiece.Index.column + 1);
-
-                    while (current.row < Height && current.column < Width)
-                    {
-                        indices.Add(current);
-
-                        current.row++;
-                        current.column++;
-                    }
-                }
-
-                // Bal oldalt felfelé
-                {
-                    (int row, int column) current = (chessPiece.Index.row + 1, chessPiece.Index.column - 1);
-
-                    while (current.row < Height && current.column >= 0)
-                    {
-                        indices.Add(current);
-
-                        current.row++;
-                        current.column--;
-                    }
-                }
-
-                // Jobb oldalt lefelé
-                {
-                    (int row, int column) current = (chessPiece.Index.row - 1, chessPiece.Index.column + 1);
-
-                    while (current.row >= 0 && current.column < Width)
-                    {
-                        indices.Add(current);
-
-                        current.row--;
-                        current.column++;
-                    }
-                }
-
+                var indices = (chessPiece as BishopChessPiece).GetCollusionIndices((Width, Height));
                 return IsInCollusionByIndices(indices, allowedCollusion);
             }
 
@@ -335,24 +357,12 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             {
                 if (king?.Type != ChessPieceType.King) throw new ArgumentException("Provided ChessPiece is not a king");
 
-                var neighbourOffsetList = new List<(int rowOffset, int columnOffset)>()
-                {
-                     (1, -1),     (1, 0),      (1, 1),
-                     (0, -1),   /* center */   (0, 1),
-                    (-1, -1),    (-1, 0),     (-1, 1),
-                };
-
                 var possibleHits = new List<ChessPiece>();
 
-                foreach (var (rowOffset, columnOffset) in neighbourOffsetList)
+                var indices = king.GetCollusionIndices((Width, Height));
+
+                foreach (var (row, column) in indices)
                 {
-                    (int row, int column) = (king.Index.row + rowOffset, king.Index.column + columnOffset);
-
-                    if (row < 0 || column < 0 || row >= Height || column >= Width)
-                    {
-                        continue;
-                    }
-
                     var originalNeighbour = Table[row, column];
                     if (originalNeighbour == null)
                     {
