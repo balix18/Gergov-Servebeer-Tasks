@@ -19,7 +19,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 Rook
             }
 
-            private ValuesEnum Value { get; }
+            public ValuesEnum Value { get; }
 
             public char ShortName { get; }
             public string CsvName { get; }
@@ -62,7 +62,13 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             { }
         }
 
-        class ChessPiece
+        interface IChessPieceCollusion
+        {
+            IEnumerable<(int row, int column)> GetCollusionIndices();
+        }
+
+        abstract class ChessPiece
+            : IChessPieceCollusion
         {
             public ChessPieceType Type { get; }
 
@@ -87,6 +93,8 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 public static char IndexToPrettyColumnConverter(int column) => (char)(column + 'A');
             }
 
+            public abstract IEnumerable<(int row, int column)> GetCollusionIndices();
+
             public ChessPiece(ChessPieceType type, char prettyColumn, int prettyRow)
             {
                 Type = type;
@@ -101,6 +109,57 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             }
 
             public override string ToString() => $"Type: {Type, 7}, PrettyColumn: {PrettyColumn}, PrettyRow: {PrettyRow}, Index: {Index}";
+        }
+
+        class BishopChessPiece
+            : ChessPiece
+        {
+            public BishopChessPiece(char prettyColumn, int prettyRow)
+                : base(ChessPieceType.Bishop, prettyColumn, prettyRow)
+            { }
+
+            public BishopChessPiece((int row, int column) positionIndex)
+                : base(ChessPieceType.Bishop, positionIndex)
+            { }
+
+            public override IEnumerable<(int row, int column)> GetCollusionIndices()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class KingChessPiece
+            : ChessPiece
+        {
+            public KingChessPiece(char prettyColumn, int prettyRow)
+                : base(ChessPieceType.King, prettyColumn, prettyRow)
+            { }
+
+            public KingChessPiece((int row, int column) positionIndex)
+                : base(ChessPieceType.King, positionIndex)
+            { }
+
+            public override IEnumerable<(int row, int column)> GetCollusionIndices()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class RookChessPiece
+            : ChessPiece
+        {
+            public RookChessPiece(char prettyColumn, int prettyRow)
+                : base(ChessPieceType.Rook, prettyColumn, prettyRow)
+            { }
+
+            public RookChessPiece((int row, int column) positionIndex)
+                : base(ChessPieceType.Rook, positionIndex)
+            { }
+
+            public override IEnumerable<(int row, int column)> GetCollusionIndices()
+            {
+                throw new NotImplementedException();
+            }
         }
 
         class ChessTable
@@ -306,7 +365,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                     Table[originalNeighbour.Index.row, originalNeighbour.Index.column] = null;
 
                     // Oda kell tenni a szomszédos figura helyére, és meg kell nézni, hogy ott sakk-ban lenne-e
-                    var movedKing = new ChessPiece(ChessPieceType.King, (row, column));
+                    var movedKing = new KingChessPiece((row, column));
                     Table[row, column] = movedKing;
 
                     if (!IsKingInCheck(movedKing))
@@ -455,13 +514,17 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
                     if (matchingChessPieceType == null) throw new ArgumentException($"Invalid data. (Line: {line})");
 
-                    return new ChessPiece(
-                        type: matchingChessPieceType,
-                        prettyColumn: lineStruct.Column,
-                        prettyRow: lineStruct.Row
-                    );
+                    return CreateMatchingObject(matchingChessPieceType, lineStruct.Column, lineStruct.Row);
                 })
                 .ToList();
+
+            ChessPiece CreateMatchingObject(ChessPieceType matchingChessPieceType, char prettyColumn, int prettyRow)
+            {
+                if (matchingChessPieceType == ChessPieceType.Bishop) return new BishopChessPiece(prettyColumn, prettyRow);
+                else if (matchingChessPieceType == ChessPieceType.King) return new KingChessPiece(prettyColumn, prettyRow);
+                else if (matchingChessPieceType == ChessPieceType.Rook) return new RookChessPiece(prettyColumn, prettyRow);
+                else throw new ArgumentException($"Invalid ChessPieceType : {matchingChessPieceType}");
+            }
         }
     }
 }
