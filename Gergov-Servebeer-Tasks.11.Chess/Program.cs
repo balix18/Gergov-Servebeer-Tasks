@@ -19,7 +19,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 Rook
             }
 
-            public ValuesEnum Value { get; }
+            private ValuesEnum Value { get; }
 
             public char ShortName { get; }
             public string CsvName { get; }
@@ -30,7 +30,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public static IEnumerable<ChessPieceType> TypeList => GetAll<ChessPieceType>();
 
-            public ChessPieceType(ValuesEnum value, char shortName, string csvName)
+            protected ChessPieceType(ValuesEnum value, char shortName, string csvName)
                 : base(value.IntValue(), value.ToString())
             {
                 Value = value;
@@ -143,7 +143,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public bool IsRookInCollusion(ChessPiece chessPiece, IEnumerable<ChessPieceType> allowedCollusion)
             {
-                if (chessPiece?.Type.Value != ChessPieceType.ValuesEnum.Rook) throw new ArgumentException("Chess piece does not exist or not rook type.");
+                if (chessPiece?.Type != ChessPieceType.Rook) throw new ArgumentException("Chess piece does not exist or not rook type.");
 
                 List<(int row, int column)> indices = new List<(int row, int column)>();
 
@@ -170,7 +170,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public bool IsBishopInCollusion(ChessPiece chessPiece, IEnumerable<ChessPieceType> allowedCollusion)
             {
-                if (chessPiece?.Type.Value != ChessPieceType.ValuesEnum.Bishop) throw new ArgumentException("Chess piece does not exist or not rook type.");
+                if (chessPiece?.Type != ChessPieceType.Bishop) throw new ArgumentException("Chess piece does not exist or not rook type.");
 
                 List<(int row, int column)> indices = new List<(int row, int column)>();
 
@@ -233,7 +233,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             {
                 foreach (var (row, column) in indices)
                 {
-                    if (!IsCellEmpty(row, column) && allowedCollusion.Any(current => current.Value == Table[row, column].Type.Value))
+                    if (!IsCellEmpty(row, column) && allowedCollusion.Any(chessPieceType => chessPieceType == Table[row, column].Type))
                     {
                         return true;
                     }
@@ -244,12 +244,12 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public bool IsKingInCheck(ChessPiece king)
             {
-                if (king.Type.Value != ChessPieceType.ValuesEnum.King) throw new ArgumentException("Provided ChessPiece is not a king");
+                if (king?.Type != ChessPieceType.King) throw new ArgumentException("Provided ChessPiece is not a king");
 
                 var allowedCollusions = new List<ChessPieceType>() { ChessPieceType.King };
 
                 {
-                    var rookList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece.Type.Value == ChessPieceType.ValuesEnum.Rook);
+                    var rookList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Rook);
                     foreach (var rook in rookList) {
                         if (IsRookInCollusion(rook, allowedCollusions))
                         {
@@ -259,7 +259,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 }
 
                 {
-                    var bishopList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece.Type.Value == ChessPieceType.ValuesEnum.Bishop);
+                    var bishopList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Bishop);
                     foreach (var bishop in bishopList)
                     {
                         if (IsBishopInCollusion(bishop, allowedCollusions))
@@ -274,7 +274,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public IEnumerable<ChessPiece> GetKingAttackPossibilities(ChessPiece king)
             {
-                if (king.Type.Value != ChessPieceType.ValuesEnum.King) throw new ArgumentException("Provided ChessPiece is not a king");
+                if (king?.Type != ChessPieceType.King) throw new ArgumentException("Provided ChessPiece is not a king");
 
                 var neighbourOffsetList = new List<(int rowOffset, int columnOffset)>()
                 {
@@ -415,7 +415,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 "Bishop isnt colliding"
             );
 
-            var king = table.GetEveryChessPieceOnTable().Where(chessPiece => chessPiece.Type.Value == ChessPieceType.ValuesEnum.King).First();
+            var king = table.GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.King).First();
             Console.WriteLine(table.IsKingInCheck(king) ?
                 "King is in check" :
                 "King is not in check"
