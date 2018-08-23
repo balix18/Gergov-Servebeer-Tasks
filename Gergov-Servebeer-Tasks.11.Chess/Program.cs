@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Gergov_Servebeer_Tasks._11.Chess
 {
     class Program
     {
-        class ChessPieceType
+        abstract class ChessPieceType
+            : SafeEnumeration<ChessPieceType.ValuesEnum, ChessPieceType>
         {
             public enum ValuesEnum
             {
@@ -22,34 +24,42 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             public char ShortName { get; }
             public string CsvName { get; }
 
-            public static ChessPieceType Bishop { get; } 
-            public static ChessPieceType King { get; }
-            public static ChessPieceType Rook { get; }
+            public static BishopChessPieceType Bishop { get; } = new BishopChessPieceType();
+            public static KingChessPieceType King { get; } = new KingChessPieceType();
+            public static RookChessPieceType Rook { get; } = new RookChessPieceType();
 
-            public static IEnumerable<ChessPieceType> TypeList { get; }
+            public static IEnumerable<ChessPieceType> TypeList => GetAll<ChessPieceType>();
 
             public ChessPieceType(ValuesEnum value, char shortName, string csvName)
+                : base(value.IntValue(), value.ToString())
             {
                 Value = value;
                 ShortName = shortName;
                 CsvName = csvName;
             }
 
-            static ChessPieceType()
-            {
-                Bishop = new ChessPieceType(ValuesEnum.Bishop, 'B', "Futó");
-                King = new ChessPieceType(ValuesEnum.King, 'K', "Király");
-                Rook = new ChessPieceType(ValuesEnum.Rook, 'R', "Bástya");
-
-                TypeList = new List<ChessPieceType>()
-                {
-                    Bishop,
-                    King,
-                    Rook
-                };
-            }
-
             public override string ToString() => Value.ToString();
+        }
+
+        class BishopChessPieceType : ChessPieceType
+        {
+            public BishopChessPieceType()
+                : base(ValuesEnum.Bishop, 'B', "Futó")
+            { }
+        }
+
+        class KingChessPieceType: ChessPieceType
+        {
+            public KingChessPieceType()
+                : base(ValuesEnum.King, 'K', "Király")
+            { }
+        }
+
+        class RookChessPieceType : ChessPieceType
+        {
+            public RookChessPieceType()
+                : base(ValuesEnum.Rook, 'R', "Bástya")
+            { }
         }
 
         class ChessPiece
