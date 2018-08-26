@@ -9,7 +9,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 {
     class Program
     {
-        abstract class ChessPieceType
+        class ChessPieceType
             : SafeEnumeration<ChessPieceType.ValuesEnum, ChessPieceType>
         {
             public enum ValuesEnum
@@ -24,9 +24,9 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             public char ShortName { get; }
             public string CsvName { get; }
 
-            public static BishopChessPieceType Bishop { get; } = new BishopChessPieceType();
-            public static KingChessPieceType King { get; } = new KingChessPieceType();
-            public static RookChessPieceType Rook { get; } = new RookChessPieceType();
+            public static ChessPieceType Bishop { get; } = new ChessPieceType(ValuesEnum.Bishop, 'B', "Futó");
+            public static ChessPieceType King { get; } = new ChessPieceType(ValuesEnum.King, 'K', "Király");
+            public static ChessPieceType Rook { get; } = new ChessPieceType(ValuesEnum.Rook, 'R', "Bástya");
 
             public static IEnumerable<ChessPieceType> TypeList => GetAll<ChessPieceType>();
 
@@ -39,27 +39,6 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             }
 
             public override string ToString() => Value.ToString();
-        }
-
-        class BishopChessPieceType : ChessPieceType
-        {
-            public BishopChessPieceType()
-                : base(ValuesEnum.Bishop, 'B', "Futó")
-            { }
-        }
-
-        class KingChessPieceType: ChessPieceType
-        {
-            public KingChessPieceType()
-                : base(ValuesEnum.King, 'K', "Király")
-            { }
-        }
-
-        class RookChessPieceType : ChessPieceType
-        {
-            public RookChessPieceType()
-                : base(ValuesEnum.Rook, 'R', "Bástya")
-            { }
         }
 
         interface IChessPieceCollusion
