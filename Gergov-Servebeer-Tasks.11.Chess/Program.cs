@@ -10,27 +10,30 @@ namespace Gergov_Servebeer_Tasks._11.Chess
     class Program
     {
         class ChessPieceType
-            : SafeEnumeration<ChessPieceType.ValuesEnum, ChessPieceType>
+            : SafeEnumeration<ChessPieceType.Meta, ChessPieceType.Meta.ValuesEnum, ChessPieceType>
         {
-            public enum ValuesEnum
+            public class Meta
             {
-                Bishop,
-                King,
-                Rook
+                public enum ValuesEnum
+                {
+                    Bishop,
+                    King,
+                    Rook
+                }
+
+                public static ChessPieceType Bishop { get; } = new ChessPieceType(ValuesEnum.Bishop, 'B', "Futó");
+                public static ChessPieceType King { get; } = new ChessPieceType(ValuesEnum.King, 'K', "Király");
+                public static ChessPieceType Rook { get; } = new ChessPieceType(ValuesEnum.Rook, 'R', "Bástya");
             }
 
-            public ValuesEnum Value { get; }
+            public Meta.ValuesEnum Value { get; }
 
             public char ShortName { get; }
             public string CsvName { get; }
 
-            public static ChessPieceType Bishop { get; } = new ChessPieceType(ValuesEnum.Bishop, 'B', "Futó");
-            public static ChessPieceType King { get; } = new ChessPieceType(ValuesEnum.King, 'K', "Király");
-            public static ChessPieceType Rook { get; } = new ChessPieceType(ValuesEnum.Rook, 'R', "Bástya");
-
             public static IEnumerable<ChessPieceType> TypeList => GetAll<ChessPieceType>();
 
-            protected ChessPieceType(ValuesEnum value, char shortName, string csvName)
+            protected ChessPieceType(Meta.ValuesEnum value, char shortName, string csvName)
                 : base(value.IntValue(), value.ToString())
             {
                 Value = value;
@@ -93,11 +96,11 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             : ChessPiece
         {
             public BishopChessPiece(char prettyColumn, int prettyRow)
-                : base(ChessPieceType.Bishop, prettyColumn, prettyRow)
+                : base(ChessPieceType.Meta.Bishop, prettyColumn, prettyRow)
             { }
 
             public BishopChessPiece((int row, int column) positionIndex)
-                : base(ChessPieceType.Bishop, positionIndex)
+                : base(ChessPieceType.Meta.Bishop, positionIndex)
             { }
 
             public override IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize)
@@ -164,11 +167,11 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             : ChessPiece
         {
             public KingChessPiece(char prettyColumn, int prettyRow)
-                : base(ChessPieceType.King, prettyColumn, prettyRow)
+                : base(ChessPieceType.Meta.King, prettyColumn, prettyRow)
             { }
 
             public KingChessPiece((int row, int column) positionIndex)
-                : base(ChessPieceType.King, positionIndex)
+                : base(ChessPieceType.Meta.King, positionIndex)
             { }
 
             public override IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize)
@@ -202,11 +205,11 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             : ChessPiece
         {
             public RookChessPiece(char prettyColumn, int prettyRow)
-                : base(ChessPieceType.Rook, prettyColumn, prettyRow)
+                : base(ChessPieceType.Meta.Rook, prettyColumn, prettyRow)
             { }
 
             public RookChessPiece((int row, int column) positionIndex)
-                : base(ChessPieceType.Rook, positionIndex)
+                : base(ChessPieceType.Meta.Rook, positionIndex)
             { }
 
             public override IEnumerable<(int row, int column)> GetCollusionIndices((int width, int height) tableSize)
@@ -275,7 +278,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public bool IsRookInCollusion(ChessPiece chessPiece, IEnumerable<ChessPieceType> allowedCollusion)
             {
-                if (chessPiece?.Type != ChessPieceType.Rook) throw new ArgumentException("Chess piece does not exist or not rook type.");
+                if (chessPiece?.Type != ChessPieceType.Meta.Rook) throw new ArgumentException("Chess piece does not exist or not rook type.");
 
                 var indices = (chessPiece as RookChessPiece).GetCollusionIndices((Width, Height));
                 return IsInCollusionByIndices(indices, allowedCollusion);
@@ -283,7 +286,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public bool IsBishopInCollusion(ChessPiece chessPiece, IEnumerable<ChessPieceType> allowedCollusion)
             {
-                if (chessPiece?.Type != ChessPieceType.Bishop) throw new ArgumentException("Chess piece does not exist or not rook type.");
+                if (chessPiece?.Type != ChessPieceType.Meta.Bishop) throw new ArgumentException("Chess piece does not exist or not rook type.");
 
                 var indices = (chessPiece as BishopChessPiece).GetCollusionIndices((Width, Height));
                 return IsInCollusionByIndices(indices, allowedCollusion);
@@ -304,12 +307,12 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public bool IsKingInCheck(ChessPiece king)
             {
-                if (king?.Type != ChessPieceType.King) throw new ArgumentException("Provided ChessPiece is not a king");
+                if (king?.Type != ChessPieceType.Meta.King) throw new ArgumentException("Provided ChessPiece is not a king");
 
-                var allowedCollusions = new List<ChessPieceType>() { ChessPieceType.King };
+                var allowedCollusions = new List<ChessPieceType>() { ChessPieceType.Meta.King };
 
                 {
-                    var rookList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Rook);
+                    var rookList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Meta.Rook);
                     foreach (var rook in rookList) {
                         if (IsRookInCollusion(rook, allowedCollusions))
                         {
@@ -319,7 +322,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 }
 
                 {
-                    var bishopList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Bishop);
+                    var bishopList = GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Meta.Bishop);
                     foreach (var bishop in bishopList)
                     {
                         if (IsBishopInCollusion(bishop, allowedCollusions))
@@ -334,7 +337,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             public IEnumerable<ChessPiece> GetKingAttackPossibilities(ChessPiece king)
             {
-                if (king?.Type != ChessPieceType.King) throw new ArgumentException("Provided ChessPiece is not a king");
+                if (king?.Type != ChessPieceType.Meta.King) throw new ArgumentException("Provided ChessPiece is not a king");
 
                 var possibleHits = new List<ChessPiece>();
 
@@ -463,7 +466,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 "Bishop isnt colliding"
             );
 
-            var king = table.GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.King).First();
+            var king = table.GetEveryChessPieceOnTable().Where(chessPiece => chessPiece?.Type == ChessPieceType.Meta.King).First();
             Console.WriteLine(table.IsKingInCheck(king) ?
                 "King is in check" :
                 "King is not in check"
@@ -509,9 +512,9 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
             ChessPiece CreateMatchingObject(ChessPieceType matchingChessPieceType, char prettyColumn, int prettyRow)
             {
-                if (matchingChessPieceType == ChessPieceType.Bishop) return new BishopChessPiece(prettyColumn, prettyRow);
-                else if (matchingChessPieceType == ChessPieceType.King) return new KingChessPiece(prettyColumn, prettyRow);
-                else if (matchingChessPieceType == ChessPieceType.Rook) return new RookChessPiece(prettyColumn, prettyRow);
+                if (matchingChessPieceType == ChessPieceType.Meta.Bishop) return new BishopChessPiece(prettyColumn, prettyRow);
+                else if (matchingChessPieceType == ChessPieceType.Meta.King) return new KingChessPiece(prettyColumn, prettyRow);
+                else if (matchingChessPieceType == ChessPieceType.Meta.Rook) return new RookChessPiece(prettyColumn, prettyRow);
                 else throw new ArgumentException($"Invalid ChessPieceType : {matchingChessPieceType}");
             }
         }

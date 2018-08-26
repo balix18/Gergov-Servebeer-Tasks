@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 namespace Gergov_Servebeer_Tasks._11.Chess
 {
-    public abstract class SafeEnumeration<TEnum, TSelf>
-        : IEquatable<SafeEnumeration<TEnum, TSelf>>
+    public abstract class SafeEnumeration<TMeta, TEnum, TSelf>
+        : IEquatable<SafeEnumeration<TMeta, TEnum, TSelf>>
+        where TMeta : class
         where TEnum : Enum
-        where TSelf : SafeEnumeration<TEnum, TSelf>
+        where TSelf : SafeEnumeration<TMeta, TEnum, TSelf>
     {
         public string Name { get; }
         public int Id { get; }
@@ -22,11 +23,11 @@ namespace Gergov_Servebeer_Tasks._11.Chess
         public override string ToString() => $"Id: {Id}, Name: {Name}";
 
         public static IEnumerable<T> GetAll<T>()
-            where T : SafeEnumeration<TEnum, TSelf>
+            where T : SafeEnumeration<TMeta, TEnum, TSelf>
         {
-            var matches = typeof(T)
+            var matches = typeof(TMeta)
                 .GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                .Where(propertyInfo => typeof(SafeEnumeration<TEnum, TSelf>).IsAssignableFrom(propertyInfo.PropertyType))
+                .Where(propertyInfo => typeof(SafeEnumeration<TMeta, TEnum, TSelf>).IsAssignableFrom(propertyInfo.PropertyType))
                 .Select(propertyInfo => propertyInfo.GetValue(null))
                 .Cast<T>()
                 .ToList();
@@ -36,7 +37,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             return matches;
         }
 
-        public static bool operator ==(SafeEnumeration<TEnum, TSelf> obj1, SafeEnumeration<TEnum, TSelf> obj2)
+        public static bool operator ==(SafeEnumeration<TMeta, TEnum, TSelf> obj1, SafeEnumeration<TMeta, TEnum, TSelf> obj2)
         {
             if (ReferenceEquals(obj1, obj2))
             {
@@ -51,12 +52,12 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             return obj1.Equals(obj2);
         }
 
-        public static bool operator !=(SafeEnumeration<TEnum, TSelf> obj1, SafeEnumeration<TEnum, TSelf> obj2)
+        public static bool operator !=(SafeEnumeration<TMeta, TEnum, TSelf> obj1, SafeEnumeration<TMeta, TEnum, TSelf> obj2)
         {
             return !(obj1 == obj2);
         }
 
-        public bool Equals(SafeEnumeration<TEnum, TSelf> other)
+        public bool Equals(SafeEnumeration<TMeta, TEnum, TSelf> other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -83,7 +84,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
                 return true;
             }
 
-            return typeof(SafeEnumeration<TEnum, TSelf>).IsAssignableFrom(obj.GetType()) && Equals((SafeEnumeration<TEnum, TSelf>)obj);
+            return typeof(SafeEnumeration<TMeta, TEnum, TSelf>).IsAssignableFrom(obj.GetType()) && Equals((SafeEnumeration<TMeta, TEnum, TSelf>)obj);
         }
 
         public override int GetHashCode()
