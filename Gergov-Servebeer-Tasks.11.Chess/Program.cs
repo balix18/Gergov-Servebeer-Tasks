@@ -31,7 +31,7 @@ namespace Gergov_Servebeer_Tasks._11.Chess
             public char ShortName { get; }
             public string CsvName { get; }
 
-            public static IEnumerable<ChessPieceType> TypeList => GetAll<ChessPieceType>();
+            public static IEnumerable<ChessPieceType> TypeList => GetAll();
 
             protected ChessPieceType(Meta.ValuesEnum value, char shortName, string csvName)
                 : base(value.IntValue(), value.ToString())

@@ -22,20 +22,23 @@ namespace Gergov_Servebeer_Tasks._11.Chess
 
         public override string ToString() => $"Id: {Id}, Name: {Name}";
 
-        public static IEnumerable<T> GetAll<T>()
-            where T : SafeEnumeration<TMeta, TEnum, TSelf>
-        {
-            var matches = typeof(TMeta)
-                .GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                .Where(propertyInfo => typeof(SafeEnumeration<TMeta, TEnum, TSelf>).IsAssignableFrom(propertyInfo.PropertyType))
-                .Select(propertyInfo => propertyInfo.GetValue(null))
-                .Cast<T>()
-                .ToList();
+        public static IEnumerable<TSelf> GetAll() => lazyGetAll.Value;
 
-            if (matches.Count == 0) throw new Exception("Parent class must create at least one public static property, which type inherits from TSelf");
+        private static Lazy<IEnumerable<TSelf>> lazyGetAll = new Lazy<IEnumerable<TSelf>>(() => 
+            {
+                var matches = typeof(TMeta)
+                    .GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                    .Where(propertyInfo => typeof(SafeEnumeration<TMeta, TEnum, TSelf>).IsAssignableFrom(propertyInfo.PropertyType))
+                    .Select(propertyInfo => propertyInfo.GetValue(null))
+                    .Cast<TSelf>()
+                    .ToList();
 
-            return matches;
-        }
+                if (matches.Count == 0) throw new Exception("Parent class must create at least one public static property, which type inherits from TSelf");
+
+                return matches;
+            }, 
+            isThreadSafe: false
+        );
 
         public static bool operator ==(SafeEnumeration<TMeta, TEnum, TSelf> obj1, SafeEnumeration<TMeta, TEnum, TSelf> obj2)
         {
